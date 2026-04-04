@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+      "destination": "/$1"
+    }
+  ]
+}
