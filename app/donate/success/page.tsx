@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertTriangle,
@@ -87,6 +87,52 @@ function StatusBadge({ state }: { state: VerifyState }) {
 }
 
 export default function DonationSuccessPage() {
+  return (
+    <Suspense fallback={<DonationSuccessFallback />}>
+      <DonationSuccessContent />
+    </Suspense>
+  );
+}
+
+function DonationSuccessFallback() {
+  return (
+    <div className="min-h-screen bg-[#060816] text-white">
+      <Navbar />
+
+      <main className="relative overflow-hidden px-6 pb-20 pt-32 lg:px-10">
+        <div className="pointer-events-none absolute -left-16 top-20 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(56, 189, 248, 0.22)" }} />
+        <div className="pointer-events-none absolute right-0 bottom-0 h-96 w-96 rounded-full blur-3xl" style={{ background: "rgba(59, 130, 246, 0.16)" }} />
+
+        <div className="relative mx-auto max-w-7xl">
+          <section
+            className="rounded-4xl border p-8 shadow-[0_28px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-10"
+            style={{
+              background: "linear-gradient(180deg, rgba(7, 17, 31, 0.96), rgba(11, 27, 48, 0.92))",
+              borderColor: "rgba(125, 211, 252, 0.22)",
+            }}
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/35 bg-sky-300/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-sky-100">
+              <LoaderCircle className="h-4 w-4 animate-spin text-sky-200" />
+              Preparing Verification
+            </div>
+
+            <h1 className="mt-6 text-4xl font-semibold leading-tight text-white sm:text-5xl">
+              Loading payment confirmation.
+            </h1>
+
+            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+              Please wait while the payment return page initializes and reads the verification reference.
+            </p>
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
+function DonationSuccessContent() {
   useScrollReveal();
 
   const searchParams = useSearchParams();
