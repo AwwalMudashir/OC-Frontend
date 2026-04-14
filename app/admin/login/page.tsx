@@ -2,13 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import { LockKeyhole, Mail, ShieldCheck, Loader2 } from "lucide-react";
 import { useToast } from "../../components/ToastProvider";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const toast = useToast();
   const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,35 +24,49 @@ export default function AdminLoginPage() {
       return;
     }
 
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: email.trim(), password }),
-    });
+    setIsLoading(true);
 
-    const payload = (await response.json().catch(() => null)) as
-      | { statusCode?: number; message?: string }
-      | null;
-
-    if (!response.ok) {
-      toast.error({
-        title: "Login failed",
-        message: payload?.message || "Invalid credentials or access denied.",
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email.trim(), password }),
       });
-      return;
+
+      const payload = (await response.json().catch(() => null)) as
+        | { statusCode?: number; message?: string }
+        | null;
+
+      if (!response.ok) {
+        toast.error({
+          title: "Login failed",
+          message: payload?.message || "Invalid credentials or access denied.",
+        });
+        return;
+      }
+
+      toast.success({
+        title: "Access granted",
+        message: "Redirecting to the admin dashboard.",
+      });
+
+      startTransition(() => {
+        router.push("/admin");
+        router.refresh();
+      });
+    } catch (error) {
+      toast.error({
+        title: "Login error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to reach the login service.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.success({
-      title: "Access granted",
-      message: "Redirecting to the admin dashboard.",
-    });
-
-    startTransition(() => {
-      router.push("/admin");
-      router.refresh();
-    });
   }
 
   return (
@@ -118,14 +133,22 @@ export default function AdminLoginPage() {
 
               <button
                 type="submit"
-                disabled={isPending}
-                className="inline-flex w-full items-center justify-center rounded-full px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
+                disabled={isPending || isLoading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
                 style={{
                   background: "#d9485f",
                   boxShadow: "0 18px 40px rgba(217, 72, 95, 0.3)",
                 }}
+                aria-busy={isLoading}
               >
-                {isPending ? "Opening Dashboard..." : "Login To Dashboard"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Opening Dashboard...
+                  </>
+                ) : (
+                  "Login To Dashboard"
+                )}
               </button>
             </form>
           </section>
