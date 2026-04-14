@@ -16,6 +16,19 @@ const socialItems = [
     ),
   },
   {
+    label: "YouTube",
+    href: "https://www.youtube.com/channel/UC-xPmV-0cU1dc8you8K3DBA",
+    icon: (
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-4 w-4 fill-current"
+      >
+        <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z" />
+      </svg>
+    ),
+  },
+  {
     label: "X",
     icon: (
       <svg
@@ -134,14 +147,28 @@ export default function Footer() {
           <div className="mt-4 flex gap-4">
 
             {socialItems.map((social) => (
-              <div
-                key={social.label}
-                className="h-10 w-10 flex items-center justify-center rounded-full border border-white/10 text-gray-400 hover:text-white hover:border-white/30 transition"
-                aria-label={social.label}
-                title={social.label}
-              >
-                {social.icon}
-              </div>
+                social.href ? (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-gray-400 transition hover:border-white/30 hover:text-white"
+                    aria-label={social.label}
+                    title={social.label}
+                  >
+                    {social.icon}
+                  </a>
+                ) : (
+                  <div
+                    key={social.label}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-gray-400 transition hover:border-white/30 hover:text-white"
+                    aria-label={social.label}
+                    title={social.label}
+                  >
+                    {social.icon}
+                  </div>
+                )
             ))}
 
           </div>

@@ -2,56 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import apiFetch from "../api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
-const educationTimeline = [
-    {
-        year: "1995",
-        title: "Moradayo Nursery and Primary School",
-        detail: "Completed early education and earned the First School Leaving Certificate.",
-    },
-    {
-        year: "2001",
-        title: "Olalomi Comprehensive College, Offa",
-        detail: "Built a strong secondary-school foundation shaped by discipline and civic awareness.",
-    },
-    {
-        year: "2005",
-        title: "Federal Polytechnic Offa",
-        detail: "Completed the Ordinary National Diploma with a practical, hands-on academic focus.",
-    },
-    {
-        year: "2011",
-        title: "Kaduna Polytechnic",
-        detail: "Advanced professional studies and obtained the Higher National Diploma.",
-    },
-    {
-        year: "2015",
-        title: "LAUTECH",
-        detail: "Expanded leadership and specialist capacity through a Postgraduate Diploma programme.",
-    },
-];
-
-const workExperience = [
-    {
-        title: "Oceanic Bank Plc",
-        desc: "Worked in financial services and customer relations from 2006 to 2009, gaining frontline experience in trust, structure, and service delivery.",
-    },
-    {
-        title: "ICMA Professional Services",
-        desc: "Delivered professional and administrative expertise from 2011 onward, strengthening operations and strategic coordination.",
-    },
-    {
-        title: "MULAT Group",
-        desc: "Leads MULAT Table Water and MULAT Farms as Managing Director, creating jobs and building sustainable local enterprise.",
-    },
-    {
-        title: "Express Payment Solutions",
-        desc: "Contributed to financial and digital service operations in 2021, with exposure to modern payment systems and execution detail.",
-    },
-];
+import useScrollReveal from "../components/useScrollReveal";
+import type { EducationTimelineItem, JobTimelineItem } from "../types/education";
 
 const leadershipPillars = [
     "Youth empowerment programmes",
@@ -61,38 +17,66 @@ const leadershipPillars = [
 ];
 
 export default function AboutPage() {
+    const [educationTimeline, setEducationTimeline] = useState<EducationTimelineItem[]>([]);
+    const [isLoadingEducation, setIsLoadingEducation] = useState(true);
+    const [educationError, setEducationError] = useState("");
+    const [workExperience, setWorkExperience] = useState<JobTimelineItem[]>([]);
+    const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+    const [jobError, setJobError] = useState("");
+
+    useScrollReveal();
+
     useEffect(() => {
-        const elements = Array.from(
-            document.querySelectorAll<HTMLElement>("[data-reveal]")
-        );
+        let active = true;
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) {
-                        return;
-                    }
+        async function loadEducationHistory() {
+            setIsLoadingEducation(true);
+            setEducationError("");
 
-                    const element = entry.target as HTMLElement;
+            const response = await apiFetch<EducationTimelineItem[]>("/api/education-history");
 
-                    const delay = element.getAttribute("data-delay");
-                    if (delay) {
-                        element.style.transitionDelay = `${delay}ms`;
-                    }
-
-                    element.classList.add("is-visible");
-                    observer.unobserve(element);
-                });
-            },
-            {
-                threshold: 0.18,
-                rootMargin: "0px 0px -8% 0px",
+            if (!active) {
+                return;
             }
-        );
 
-        elements.forEach((element) => observer.observe(element));
+            if (response.statusCode >= 400 || !Array.isArray(response.data)) {
+                setEducationTimeline([]);
+                setEducationError(response.message || "Unable to load education history right now.");
+                setIsLoadingEducation(false);
+                return;
+            }
 
-        return () => observer.disconnect();
+            setEducationTimeline(response.data);
+            setIsLoadingEducation(false);
+        }
+
+        async function loadJobHistory() {
+            setIsLoadingJobs(true);
+            setJobError("");
+
+            const response = await apiFetch<JobTimelineItem[]>("/api/job-history");
+
+            if (!active) {
+                return;
+            }
+
+            if (response.statusCode >= 400 || !Array.isArray(response.data)) {
+                setWorkExperience([]);
+                setJobError(response.message || "Unable to load job history right now.");
+                setIsLoadingJobs(false);
+                return;
+            }
+
+            setWorkExperience(response.data);
+            setIsLoadingJobs(false);
+        }
+
+        void loadEducationHistory();
+        void loadJobHistory();
+
+        return () => {
+            active = false;
+        };
     }, []);
 
   return (
@@ -225,52 +209,69 @@ export default function AboutPage() {
                     <div className="relative mt-16">
                         
                         {/* Vertical Line */}
-                        <div className="absolute left-4 top-0 bottom-0 w-[2px] bg-white/10 md:left-1/2 md:-translate-x-1/2" />
+                        <div className="absolute bottom-0 left-4 top-0 w-0.5 bg-white/10 md:left-1/2 md:-translate-x-1/2" />
 
-                        <div className="space-y-12">
-                        {educationTimeline.map((item, index) => {
-                            const isLeft = index % 2 === 0;
-
-                            return (
-                            <div
-                                key={item.year}
-                                data-reveal="true"
-                                data-delay={index * 100}
-                                className={`reveal-on-scroll ${
-                                isLeft ? "reveal-left" : "reveal-right"
-                                } relative flex flex-col md:flex-row md:items-center`}
-                            >
-                                {/* LEFT SIDE */}
-                                <div
-                                className={`md:w-1/2 ${
-                                    isLeft ? "md:pr-10 md:text-right" : "md:order-2 md:pl-10"
-                                }`}
-                                >
-                                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition hover:border-white/20 hover:-translate-y-1">
-                                    
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#5dade2]">
-                                    {item.year}
-                                    </p>
-
-                                    <h3 className="mt-3 text-lg font-semibold text-white">
-                                    {item.title}
-                                    </h3>
-
-                                    <p className="mt-3 text-sm leading-7 text-slate-300">
-                                    {item.detail}
-                                    </p>
-                                </div>
-                                </div>
-
-                                {/* CENTER DOT */}
-                                <div className="absolute left-4 top-6 h-4 w-4 -translate-x-1/2 rounded-full bg-[#2f9e44] ring-4 ring-[#030712] md:left-1/2" />
-
-                                {/* RIGHT SIDE (empty for spacing) */}
-                                <div className="hidden md:block md:w-1/2" />
+                        {isLoadingEducation ? (
+                            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-sm leading-7 text-slate-300 backdrop-blur-xl">
+                                Loading education history...
                             </div>
-                            );
-                        })}
-                        </div>
+                        ) : educationError ? (
+                            <div className="rounded-3xl border border-rose-300/20 bg-rose-300/8 p-6 text-center text-sm leading-7 text-rose-100 backdrop-blur-xl">
+                                {educationError}
+                            </div>
+                        ) : educationTimeline.length === 0 ? (
+                            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-sm leading-7 text-slate-300 backdrop-blur-xl">
+                                No education history has been published yet.
+                            </div>
+                        ) : (
+                            <div className="space-y-12">
+                            {educationTimeline.map((item, index) => {
+                                const isLeft = index % 2 === 0;
+
+                                return (
+                                <div
+                                    key={item.id ?? `${item.title}-${item.period}`}
+                                    data-reveal="true"
+                                    data-delay={index * 100}
+                                    className={`reveal-on-scroll ${
+                                    isLeft ? "reveal-left" : "reveal-right"
+                                    } relative flex flex-col md:flex-row md:items-center`}
+                                >
+                                    {/* LEFT SIDE */}
+                                    <div
+                                    className={`md:w-1/2 ${
+                                        isLeft ? "md:pr-10 md:text-right" : "md:order-2 md:pl-10"
+                                    }`}
+                                    >
+                                    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition hover:border-white/20 hover:-translate-y-1">
+                                        <p className="text-xs uppercase tracking-[0.3em] text-[#5dade2]">
+                                        {item.period}
+                                        </p>
+
+                                        <h3 className="mt-3 text-lg font-semibold text-white">
+                                        {item.title}
+                                        </h3>
+
+                                        <p className="mt-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#f59e0b]">
+                                        {item.qualification}
+                                        </p>
+
+                                        <p className="mt-3 text-sm leading-7 text-slate-300">
+                                        Qualification and academic milestone attained during this period.
+                                        </p>
+                                    </div>
+                                    </div>
+
+                                    {/* CENTER DOT */}
+                                    <div className="absolute left-4 top-6 h-4 w-4 -translate-x-1/2 rounded-full bg-[#2f9e44] ring-4 ring-[#030712] md:left-1/2" />
+
+                                    {/* RIGHT SIDE (empty for spacing) */}
+                                    <div className="hidden md:block md:w-1/2" />
+                                </div>
+                                );
+                            })}
+                            </div>
+                        )}
                     </div>
                 </section>
 
@@ -280,19 +281,33 @@ export default function AboutPage() {
                         <h2 className="mt-5 text-3xl font-semibold sm:text-4xl">Professional depth across finance, administration, and enterprise.</h2>
                     </div>
 
-                    <div className="mt-12 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-                        {workExperience.map((job, index) => (
-                            <article
-                                key={job.title}
-                                data-reveal="true"
-                                data-delay={index * 80}
-                                className="reveal-on-scroll reveal-up rounded-4xl border border-white/10 bg-[#09101c]/88 p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/18"
-                            >
-                                <h3 className="text-xl font-semibold text-white">{job.title}</h3>
-                                <p className="mt-4 text-sm leading-7 text-slate-300">{job.desc}</p>
-                            </article>
-                        ))}
-                    </div>
+                    {isLoadingJobs ? (
+                        <div className="mt-12 rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-sm leading-7 text-slate-300 backdrop-blur-xl">
+                            Loading work history...
+                        </div>
+                    ) : jobError ? (
+                        <div className="mt-12 rounded-3xl border border-rose-300/20 bg-rose-300/8 p-6 text-center text-sm leading-7 text-rose-100 backdrop-blur-xl">
+                            {jobError}
+                        </div>
+                    ) : workExperience.length === 0 ? (
+                        <div className="mt-12 rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-sm leading-7 text-slate-300 backdrop-blur-xl">
+                            No work history has been published yet.
+                        </div>
+                    ) : (
+                        <div className="mt-12 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                            {workExperience.map((job, index) => (
+                                <article
+                                    key={job.id ?? `${job.title}-${job.desc}`}
+                                    data-reveal="true"
+                                    data-delay={index * 80}
+                                    className="reveal-on-scroll reveal-up rounded-4xl border border-white/10 bg-[#09101c]/88 p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/18"
+                                >
+                                    <h3 className="text-xl font-semibold text-white">{job.title}</h3>
+                                    <p className="mt-4 text-sm leading-7 text-slate-300">{job.desc}</p>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </section>
 
                 <section className="relative mx-auto max-w-7xl px-6 pb-24 pt-6 lg:px-10 lg:pb-30 lg:pt-10">

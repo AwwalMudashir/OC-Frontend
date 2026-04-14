@@ -38,20 +38,16 @@ const navBg = scrolled
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
-          <div
-            className="h-10 w-10 rounded-full"
-            
-          >
-            <img src="/apc_logo.png" alt="Logo" className="h-full w-full object-cover rounded-full" />
+          <div className="h-12 w-60 rounded-full">
+            <img src="/oc-logo.png" alt="Logo" className="h-full w-full object-cover" />
           </div>
-          <span
+          {/* <span
             className="font-semibold text-lg tracking-wide text-white"
             
           >
             Oroye Campaign
-          </span>
+          </span> */}
         </Link>
 
         {/* DESKTOP NAV */}

@@ -138,6 +138,7 @@ function DonationSuccessContent() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
   const [donorName, setDonorName] = useState<string | null>(null);
+  const [hasLoadedDonorName, setHasLoadedDonorName] = useState(false);
 
   const [state, setState] = useState<VerifyState>(reference ? "verifying" : "missing-reference");
   const [message, setMessage] = useState<string>(
@@ -154,6 +155,7 @@ function DonationSuccessContent() {
 
     const storedName = window.sessionStorage.getItem("donation_donor_name");
     setDonorName(storedName && storedName.trim() ? storedName.trim() : null);
+    setHasLoadedDonorName(true);
   }, []);
 
   useEffect(() => {
@@ -163,7 +165,21 @@ function DonationSuccessContent() {
       return;
     }
 
+    if (!hasLoadedDonorName) {
+      return;
+    }
+
     const paymentReference = reference;
+    const verificationSessionKey = `donation_verify_request:${paymentReference}`;
+
+    if (typeof window !== "undefined") {
+      const existingVerificationState = window.sessionStorage.getItem(verificationSessionKey);
+      if (existingVerificationState === "pending" || existingVerificationState === "done") {
+        return;
+      }
+
+      window.sessionStorage.setItem(verificationSessionKey, "pending");
+    }
 
     let ignore = false;
 
@@ -189,10 +205,15 @@ function DonationSuccessContent() {
         setVerifiedData(response.data ?? null);
         setMessage(response.message || "Payment verified and saved.");
 		if (typeof window !== "undefined") {
+		  window.sessionStorage.setItem(verificationSessionKey, "done");
 		  window.sessionStorage.removeItem("donation_donor_name");
 		}
         return;
       }
+
+	  if (typeof window !== "undefined") {
+		window.sessionStorage.removeItem(verificationSessionKey);
+	  }
 
       setState("failed");
       setVerifiedData(null);
@@ -204,7 +225,7 @@ function DonationSuccessContent() {
     return () => {
       ignore = true;
     };
-  }, [donorName, reference]);
+  }, [donorName, hasLoadedDonorName, reference]);
 
   const heading =
     state === "success"

@@ -19,16 +19,21 @@ type FetchOptions = {
 export default async function apiFetch<T = any>(endpoint: string, options: FetchOptions = {}): Promise<ApiResponse<T>> {
 	const base = process.env.NEXT_PUBLIC_API_BASE ?? "";
 	let url = endpoint;
-	if (base) {
+	if (base && !endpoint.startsWith("/api/")) {
 		url = base.replace(/\/+$/, "") + endpoint;
 	}
 
 	const method = options.method ?? "GET";
 	const mode = options.mode ?? "cors";
-	const body = options.body ? JSON.stringify(options.body) : undefined;
+	const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+	const body = isFormData
+		? options.body
+		: options.body
+			? JSON.stringify(options.body)
+			: undefined;
 	const headers: Record<string, string> = { ...(options.headers || {}) };
 
-	if (body && !headers["Content-Type"]) {
+	if (body && !isFormData && !headers["Content-Type"]) {
 		headers["Content-Type"] = "application/json";
 	}
 
@@ -38,7 +43,7 @@ export default async function apiFetch<T = any>(endpoint: string, options: Fetch
 		method,
 		mode,
 		headers,
-		body: options.body ?? null,
+		body: isFormData ? "[FormData]" : options.body ?? null,
 	});
 
 	try {

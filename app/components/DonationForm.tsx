@@ -3,6 +3,9 @@
 import { useState } from "react";
 import apiFetch from "../api";
 
+type DonationInitData = {
+	authorizationUrl?: string;
+};
 
 export default function DonationForm() {
 	const [name, setName] = useState("");
@@ -23,12 +26,17 @@ export default function DonationForm() {
 
 		setLoading(true);
 		try {
-			const res = await apiFetch<{ received: any }>("/api/donate", {
+			const res = await apiFetch<DonationInitData>("/api/donate", {
 				method: "POST",
 				body: { name, email, amount: Number(amount), message },
 			});
 			if (res.statusCode === 200) {
-				setStatus("Thank you — donation received (simulated).");
+				if (res.data?.authorizationUrl) {
+					window.location.href = res.data.authorizationUrl;
+					return;
+				}
+
+				setStatus(res.message || "Donation initialized successfully.");
 				setName("");
 				setEmail("");
 				setAmount("");
@@ -71,7 +79,7 @@ export default function DonationForm() {
 				<button type="submit" disabled={loading} className="px-4 py-2 rounded text-white" style={{ background: "var(--color-primary)" }}>
 					{loading ? "Processing..." : "Donate"}
 				</button>
-				<div className="text-sm text-neutral-500">Payments are simulated (backend integration pending).</div>
+				<div className="text-sm text-neutral-500">Secure payments powered by Paystack.</div>
 			</div>
 
 			{status && <p className="mt-3 text-sm">{status}</p>}

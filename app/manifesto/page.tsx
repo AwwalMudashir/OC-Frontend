@@ -1,27 +1,109 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import useScrollReveal from "../components/useScrollReveal";
 
-const pillars = [
+const manifestoValues = [
   {
+    title: "Sincerity",
+    desc: "A manifesto presented as a solemn promise, not a temporary slogan.",
+  },
+  {
+    title: "Transparency",
+    desc: "Open representation, accountable leadership, and a people-first legislative approach.",
+  },
+  {
+    title: "Dedication",
+    desc: "Focused service aimed at meaningful development and better living standards.",
+  },
+];
+
+const manifestoSections = [
+  {
+    label: "01",
+    title: "Good Governance & Representation",
+    summary:
+      "Giving Essa, Shawo, and Igbodun Constituency a stronger, more respected presence in legislative matters and state policy conversations.",
+    points: [
+      "Giving the constituency a strong voice in legislative matters",
+      "Promoting transparency and accountability in governance",
+      "Maintaining regular engagement with constituents",
+      "Ensuring constituency needs are prioritized in state policies",
+    ],
+  },
+  {
+    label: "02",
     title: "Youth Empowerment",
-    desc: "Creating opportunities through skills, funding, and innovation hubs.",
+    summary:
+      "Equipping young people with practical tools, opportunities, and support systems that can translate ambition into livelihood and leadership.",
+    points: [
+      "Skills acquisition and vocational training programmes",
+      "Youth entrepreneurship support and startup empowerment",
+      "Facilitation of job opportunities and linkages",
+      "Support for ICT and digital skills development",
+    ],
   },
   {
-    title: "Education",
-    desc: "Improving access, quality, and infrastructure across schools.",
+    label: "03",
+    title: "Education Development",
+    summary:
+      "Advancing learning as a pathway to long-term prosperity by backing students, schools, teachers, and outreach programmes across the constituency.",
+    points: [
+      "Scholarship and bursary support for students",
+      "Improvement of school facilities and learning environments",
+      "Advocacy for teacher welfare and recruitment",
+      "Support for adult literacy and educational outreach programmes",
+    ],
   },
   {
-    title: "Infrastructure",
-    desc: "Roads, water, and electricity that actually serve the people.",
+    label: "04",
+    title: "Infrastructure Development",
+    summary:
+      "Pushing for physical development that directly improves access, mobility, public services, and local economic life in communities.",
+    points: [
+      "Advocacy for road rehabilitation and rural access roads",
+      "Improved electricity supply initiatives in communities",
+      "Development of water supply systems for rural areas",
+      "Support for community based infrastructural projects",
+    ],
   },
   {
-    title: "Healthcare",
-    desc: "Accessible and affordable healthcare systems for every community.",
+    label: "05",
+    title: "Healthcare Improvement",
+    summary:
+      "Improving the quality and reach of healthcare through local access, essential support, and targeted community health intervention.",
+    points: [
+      "Better access to primary healthcare services",
+      "Support for health centres with basic equipment and drugs",
+      "Health outreach programmes for rural communities",
+      "Maternal and child health support initiatives",
+    ],
+  },
+  {
+    label: "06",
+    title: "Women & Community Development",
+    summary:
+      "Creating inclusive growth by expanding support for women, traders, cooperatives, and community development partnerships.",
+    points: [
+      "Empowerment programmes for women in trade and agriculture",
+      "Support for cooperative societies and small businesses",
+      "Community development initiatives through partnerships",
+      "Inclusion of women in decision making processes",
+    ],
+  },
+  {
+    label: "07",
+    title: "Agriculture & Rural Development",
+    summary:
+      "Supporting farmers and strengthening rural productivity so agriculture becomes a stronger engine for jobs, food security, and local wealth.",
+    points: [
+      "Support for farmers with inputs and modern techniques",
+      "Promotion of agribusiness opportunities for youths",
+      "Advocacy for irrigation and farm-to-market roads",
+      "Strengthening food security in the constituency",
+    ],
   },
 ];
 
@@ -44,165 +126,152 @@ export default function ManifestoPage() {
         <section className="relative mx-auto max-w-6xl px-6 pt-32 pb-16 text-center">
           <div className="reveal-on-scroll reveal-up" data-reveal="true">
             <p className="text-xs uppercase tracking-[0.3em] text-[#5dade2]">
-              Our Manifesto
+              Manifesto of Hon. Adebisi Muhammed Oroye
             </p>
 
             <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight">
-              A clear plan for real impact.
+              A solemn commitment to Essa, Shawo, and Igbodun Constituency.
             </h1>
 
-            <p className="mt-6 max-w-2xl mx-auto text-slate-300 text-base sm:text-lg leading-8">
-              This campaign is built on practical solutions — not promises.
-              Every pillar reflects a commitment to measurable progress and
-              community-first governance.
+            <p className="mt-6 max-w-3xl mx-auto text-slate-300 text-base sm:text-lg leading-8">
+              I, Hon. Adebisi Muhammed Oroye, present this manifesto as a solemn
+              commitment to serve the good people of Essa, Shawo, and Igbodun
+              Constituency with sincerity, transparency, and dedication. My
+              aspiration is driven by a deep desire to bring meaningful
+              development, improve living standards, and give our people a
+              stronger voice at the Kwara State House of Assembly.
             </p>
           </div>
         </section>
 
-        {/* 🔥 PILLARS GRID */}
-        <section className="relative mx-auto max-w-7xl px-6 pb-20">
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {/* 🔥 MANIFESTO INTRO DESIGN */}
+        <section className="relative mx-auto max-w-7xl px-6 pb-10">
+          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
+            <div
+              className="reveal-on-scroll reveal-left rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,34,0.96),rgba(12,24,44,0.92))] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-10"
+              data-reveal="true"
+            >
+              <p className="text-xs uppercase tracking-[0.28em] text-[#5dade2]">
+                Preamble Focus
+              </p>
+              <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+                A manifesto rooted in service, voice, and meaningful development.
+              </h2>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
+                This manifesto is not a second summary of the pillars below. It is the
+                framing promise behind them: to serve Essa, Shawo, and Igbodun Constituency
+                with sincerity, transparency, and dedication while pushing for visible
+                improvements in representation and living standards.
+              </p>
 
-            {pillars.map((item, i) => (
-              <div
-                key={item.title}
-                data-reveal="true"
-                data-delay={i * 90}
-                className="reveal-on-scroll reveal-up group relative rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
-              >
-                {/* top bar */}
-                <div className="h-1 w-16 bg-[#5dade2] rounded-full" />
-
-                <h3 className="mt-6 text-lg font-semibold">
-                  {item.title}
-                </h3>
-
-                <p className="mt-4 text-sm text-slate-300 leading-7">
-                  {item.desc}
-                </p>
-
-                {/* subtle hover glow */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-linear-to-br from-[#5dade2]/5 to-transparent rounded-3xl" />
+              <div className="mt-8 flex flex-wrap gap-3">
+                {[
+                  "Essa",
+                  "Shawo",
+                  "Igbodun",
+                  "Transparency",
+                  "Accountability",
+                  "Representation",
+                ].map((item, index) => (
+                  <span
+                    key={item}
+                    data-reveal="true"
+                    data-delay={index * 60}
+                    className="reveal-on-scroll reveal-up rounded-full border border-white/12 bg-white/6 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm"
+                  >
+                    {item}
+                  </span>
+                ))}
               </div>
-            ))}
+            </div>
 
+            <div className="grid gap-4">
+              {manifestoValues.map((value, index) => (
+                <div
+                  key={value.title}
+                  data-reveal="true"
+                  data-delay={120 + index * 80}
+                  className="reveal-on-scroll reveal-right rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+                >
+                  <p className="text-xs uppercase tracking-[0.26em] text-[#2f9e44]">
+                    Guiding Value
+                  </p>
+                  <h3 className="mt-3 text-2xl font-semibold text-white">
+                    {value.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-300 sm:text-base">
+                    {value.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* 🔥 DETAILED SECTION */}
-        <section className="relative mx-auto max-w-7xl px-6 py-20 space-y-20">
-
-          {/* ITEM */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            
-            {/* TEXT */}
-            <div className="reveal-on-scroll reveal-left" data-reveal="true">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#2f9e44]">
-                Youth Empowerment
-              </p>
-
-              <h2 className="mt-4 text-3xl sm:text-4xl font-semibold">
-                Building opportunities for the next generation.
-              </h2>
-
-              <p className="mt-6 text-slate-300 leading-8">
-                The focus is on equipping young people with real skills,
-                access to funding, and platforms to innovate. This includes
-                vocational training, tech hubs, and small business support.
-              </p>
-
-              <ul className="mt-6 space-y-3 text-sm text-slate-300">
-                <li>• Skill acquisition programs</li>
-                <li>• Startup funding initiatives</li>
-                <li>• Youth innovation hubs</li>
-              </ul>
-            </div>
-
-            {/* IMAGE */}
-            <div className="reveal-on-scroll reveal-right relative h-80 sm:h-105 rounded-3xl overflow-hidden border border-white/10" data-reveal="true" data-delay="120">
-              <Image
-                src="/youth_empowerment.jpeg"
-                alt="Youth empowerment"
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-
-          {/* REVERSE */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            
-            {/* IMAGE */}
-            <div className="reveal-on-scroll reveal-left relative h-80 sm:h-105 rounded-3xl overflow-hidden border border-white/10" data-reveal="true">
-              <Image
-                src="/adebisi_1.png"
-                alt="Education"
-                fill
-                className="object-cover"
-              />
-            </div>
-
-            {/* TEXT */}
-            <div className="reveal-on-scroll reveal-right" data-reveal="true" data-delay="120">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#5dade2]">
-                Education
-              </p>
-
-              <h2 className="mt-4 text-3xl sm:text-4xl font-semibold">
-                Strengthening the foundation of society.
-              </h2>
-
-              <p className="mt-6 text-slate-300 leading-8">
-                Education reform is key to long-term development. The plan
-                includes improving infrastructure, teacher support, and access
-                to quality learning materials.
-              </p>
-
-              <ul className="mt-6 space-y-3 text-sm text-slate-300">
-                <li>• School infrastructure upgrades</li>
-                <li>• Teacher training programs</li>
-                <li>• Digital learning access</li>
-              </ul>
-            </div>
-          </div>
-
-        </section>
-
-        {/* 🔥 CTA */}
-        <section className="relative mx-auto max-w-5xl px-6 pb-24 text-center">
-          <div className="reveal-on-scroll reveal-up rounded-3xl border border-white/10 bg-white/5 p-10 backdrop-blur-xl" data-reveal="true">
-
-            <h2 className="text-3xl sm:text-4xl font-semibold">
-              Be part of the movement.
-            </h2>
-
-            <p className="mt-4 text-slate-300">
-              Support a campaign focused on real change and measurable impact.
+        <section className="relative mx-auto max-w-7xl px-6 pb-20 pt-10 space-y-20">
+          <div className="reveal-on-scroll reveal-up mx-auto max-w-3xl text-center" data-reveal="true">
+            <p className="text-xs uppercase tracking-[0.28em] text-[#2f9e44]">
+              Full Manifesto
             </p>
-
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              
-              <Link
-                href="/donate"
-                className="px-8 py-3 rounded-full font-semibold transition duration-300 hover:-translate-y-1"
-                style={{
-                  background: "#d9485f",
-                  color: "white",
-                  boxShadow: "0 18px 38px rgba(217,72,95,0.28)",
-                }}
-              >
-                Donate Now
-              </Link>
-
-              <Link
-                href="/contact"
-                className="px-8 py-3 rounded-full border border-white/20 transition duration-300 hover:-translate-y-1 hover:bg-white/8"
-              >
-                Contact Team
-              </Link>
-
-            </div>
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl lg:text-5xl">
+              Concrete commitments backed by accountability.
+            </h2>
           </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {manifestoSections.map((section, index) => (
+              <article
+                key={section.title}
+                data-reveal="true"
+                data-delay={index * 70}
+                className={`reveal-on-scroll ${index % 2 === 0 ? "reveal-left" : "reveal-right"} rounded-4xl border border-white/10 bg-white/5 p-7 backdrop-blur-xl sm:p-8`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.28em] text-[#5dade2]">
+                      Pillar {section.label}
+                    </p>
+                    <h3 className="mt-4 text-2xl font-semibold text-white sm:text-3xl">
+                      {section.title}
+                    </h3>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-black/15 px-4 py-3 text-sm font-semibold text-white/80">
+                    {section.label}
+                  </div>
+                </div>
+
+                <p className="mt-6 text-base leading-8 text-slate-300">
+                  {section.summary}
+                </p>
+
+                <ul className="mt-7 space-y-3 text-sm leading-7 text-slate-200 sm:text-base">
+                  {section.points.map((point) => (
+                    <li key={point} className="flex gap-3">
+                      <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-[#2f9e44]" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+
+          <div className="reveal-on-scroll reveal-up rounded-4xl border border-emerald-300/16 bg-[linear-gradient(180deg,rgba(9,21,20,0.96),rgba(10,32,27,0.92))] p-8 text-center shadow-[0_24px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-10" data-reveal="true">
+            <p className="text-xs uppercase tracking-[0.28em] text-emerald-200/80">
+              Commitment
+            </p>
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+              Service with integrity, dedication, and accountability.
+            </h2>
+            <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-200 sm:text-lg">
+              I am fully committed to serving with integrity, dedication, and
+              accountability. Together, we can build a more prosperous, united,
+              and progressive Essa, Shawo, and Igbodun Constituency.
+            </p>
+          </div>
+
         </section>
 
       </main>

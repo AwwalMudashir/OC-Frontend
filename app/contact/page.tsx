@@ -115,7 +115,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Location</p>
-                    <p className="mt-2 text-sm text-slate-100 sm:text-base">Kwara State, Nigeria</p>
+                    <p className="mt-2 text-sm text-slate-100 sm:text-base">Offa, Kwara State, Nigeria</p>
                   </div>
                 </div>
               </div>
