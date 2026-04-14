@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BriefcaseBusiness, CalendarRange, CircleDollarSign, GraduationCap, LayoutDashboard, Plus, Wallet } from "lucide-react";
+import { BriefcaseBusiness, CalendarRange, CircleDollarSign, GraduationCap, LayoutDashboard, Plus, Users, Wallet } from "lucide-react";
 import AdminEducationTimelineManager from "./AdminEducationTimelineManager";
 import AdminEventManager from "./AdminEventManager";
 import AdminJobTimelineManager from "./AdminJobTimelineManager";
+import AdminAdminsManager from "./AdminAdminsManager";
 import apiFetch from "../api";
 import type { DonationItem } from "../types/education";
 
@@ -101,6 +102,7 @@ export default function AdminDashboardShell({
     { name: "Education", key: "education", icon: GraduationCap },
     { name: "Jobs", key: "jobs", icon: BriefcaseBusiness },
     { name: "Events", key: "events", icon: CalendarRange },
+    { name: "Admins", key: "admins", icon: Users },
   ];
 
   const renderContent = () => {
@@ -111,6 +113,8 @@ export default function AdminDashboardShell({
         return <AdminJobTimelineManager />;
       case "events":
         return <AdminEventManager />;
+      case "admins":
+        return <AdminAdminsManager />;
       default:
         return (
           <div className="space-y-8">
