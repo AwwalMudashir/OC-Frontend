@@ -178,7 +178,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex w-full items-center justify-center rounded-full px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
+                className="cursor-pointer inline-flex w-full items-center justify-center rounded-full px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
                 style={{
                   background: "#e11d48",
                   boxShadow: "0 18px 40px rgba(225, 29, 72, 0.32)",

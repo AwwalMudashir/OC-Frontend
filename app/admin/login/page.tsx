@@ -134,7 +134,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={isPending || isLoading}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
+                className="cursor-pointer inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
                 style={{
                   background: "#d9485f",
                   boxShadow: "0 18px 40px rgba(217, 72, 95, 0.3)",
