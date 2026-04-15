@@ -125,6 +125,14 @@ export default function DonatePage() {
 
   return (
 	<div>
+		{loading && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm">
+				<div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-white/10 bg-slate-950/90 px-7 py-8 text-center shadow-[0_30px_80px_rgba(15,23,42,0.55)]">
+					<div className="h-16 w-16 rounded-full border-4 border-t-[#d9485f] border-white/10 animate-spin" />
+					<p className="text-sm font-semibold text-white">Processing donation...</p>
+				</div>
+			</div>
+		)}
 		<Navbar/>
 		<section className="relative min-h-screen mt-6 overflow-hidden bg-black px-6 py-20 text-white flex items-center justify-center">
 		<div className="pointer-events-none absolute inset-0 opacity-90">
@@ -219,7 +227,7 @@ export default function DonatePage() {
 			<button
 				type="submit"
 				disabled={loading}
-				className="w-full py-4 rounded-full text-sm font-semibold uppercase tracking-wide transition-all duration-300"
+				className="cursor-pointer w-full py-4 rounded-full text-sm font-semibold uppercase tracking-wide transition-all duration-300"
 				style={{
 				background: "#d9485f",
 				boxShadow: "0 10px 30px rgba(217,72,95,0.3)",
