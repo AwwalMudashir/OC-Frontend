@@ -117,26 +117,36 @@ export default function AdminEventManager() {
       data.append("images", image);
     });
 
-    const res = await apiFetch<EventItem>("/api/admin/add-events", {
-      method: "POST",
-      body: data,
-    });
-
-    if (res.statusCode >= 400 || !res.data) {
-      toast.error({
-        title: "Unable to save event",
-        message: res.message || "The event could not be saved.",
+    try {
+      const res = await apiFetch<EventItem>("/api/admin/add-events", {
+        method: "POST",
+        body: data,
       });
-      setIsSubmitting(false);
-      return;
-    }
 
-    setForm(initialFormState);
-    setIsModalOpen(false);
-    setHistoryError("");
-    toast.success({ title: "Event added", message: "The event history section has been updated." });
-    setIsSubmitting(false);
-    void load();
+      if (res.statusCode >= 400) {
+        toast.error({
+          title: "Unable to save event",
+          message: res.message || "The event could not be saved.",
+        });
+        return;
+      }
+
+      if (!res.data) {
+        toast.error({
+          title: "Save failed",
+          message: "The server did not return saved event data.",
+        });
+        return;
+      }
+
+      setForm(initialFormState);
+      setIsModalOpen(false);
+      setHistoryError("");
+      toast.success({ title: "Event added", message: "The event history section has been updated." });
+      void load();
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   async function handleDelete(item: EventItem) {
