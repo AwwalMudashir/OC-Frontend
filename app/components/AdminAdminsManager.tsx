@@ -18,10 +18,6 @@ export default function AdminAdminsManager() {
   const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [isLoadingAdmins, setIsLoadingAdmins] = useState(true);
   const [loadError, setLoadError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
   useEffect(() => {
     void loadAdmins();
@@ -43,50 +39,6 @@ export default function AdminAdminsManager() {
     setIsLoadingAdmins(false);
   }
 
-  async function handleAddAdmin(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!email.trim() || !username.trim() || !password) {
-      toast.error({
-        title: "Missing information",
-        message: "Email, username, and password are all required.",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const response = await apiFetch<AdminUser>("/api/admin/register-admin", {
-      method: "POST",
-      body: {
-        email: email.trim().toLowerCase(),
-        username: username.trim(),
-        password,
-      },
-    });
-
-    if (response.statusCode >= 400) {
-      toast.error({
-        title: "Unable to add admin",
-        message: response.message || "Please check the submitted details.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    toast.success({
-      title: "Admin added",
-      message: "A new administrator account has been created.",
-    });
-
-    setEmail("");
-    setUsername("");
-    setPassword("");
-
-    await loadAdmins();
-    setIsSubmitting(false);
-  }
-
   return (
     <div className="space-y-8">
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -102,48 +54,8 @@ export default function AdminAdminsManager() {
           </div>
 
           <p className="mt-6 text-sm leading-7 text-slate-300">
-            View all admin users and add new admin accounts. Administrators cannot be deleted from this panel.
+            View all admin users. New administrator creation has been disabled in this panel for security reasons. Administrators cannot be deleted from this dashboard.
           </p>
-
-          <form onSubmit={handleAddAdmin} className="mt-8 space-y-5">
-            <div>
-              <label className="text-sm font-medium text-slate-300">Email address</label>
-              <input
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                type="email"
-                placeholder="admin@example.com"
-                className="mt-2 w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/20"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300">Username</label>
-              <input
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-                type="text"
-                placeholder="Admin name"
-                className="mt-2 w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/20"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300">Password</label>
-              <input
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                type="password"
-                placeholder="Create a password"
-                className="mt-2 w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/20"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#5dade2] px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {isSubmitting ? "Adding admin…" : "Add Admin"}
-            </button>
-          </form>
         </section>
 
         <section className="rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(8,19,40,0.97),rgba(12,16,44,0.94))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.24)]">
