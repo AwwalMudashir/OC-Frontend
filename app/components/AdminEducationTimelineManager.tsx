@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GraduationCap, Plus, Trash2, X } from "lucide-react";
+import { GraduationCap, Pencil, Plus, Trash2, X } from "lucide-react";
 import apiFetch from "../api";
 import { useToast } from "./ToastProvider";
 import type { EducationTimelineItem, EducationTimelineRequest } from "../types/education";
@@ -22,6 +22,7 @@ export default function AdminEducationTimelineManager() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [historyError, setHistoryError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -46,6 +47,34 @@ export default function AdminEducationTimelineManager() {
     setIsLoadingHistory(false);
   }
 
+  async function handleEdit(item: EducationTimelineItem) {
+    if (typeof item.id !== "number") {
+      toast.error({
+        title: "Unable to edit",
+        message: "This education entry does not have a valid ID.",
+      });
+      return;
+    }
+
+    const res = await apiFetch<EducationTimelineItem>(`/api/admin/education/${item.id}`);
+    if (res.statusCode >= 400 || !res.data) {
+      toast.error({
+        title: "Unable to load entry",
+        message: res.message || "The education entry could not be loaded for editing.",
+      });
+      return;
+    }
+
+    setForm({
+      title: res.data.title,
+      qualification: res.data.qualification,
+      startYear: res.data.period?.split("-")[0] ?? "",
+      endYear: res.data.period?.split("-")[1] ?? "",
+    });
+    setEditingId(item.id);
+    setIsModalOpen(true);
+  }
+
   function updateField<K extends keyof EducationTimelineRequest>(
     key: K,
     value: EducationTimelineRequest[K]
@@ -66,14 +95,18 @@ export default function AdminEducationTimelineManager() {
 
     setIsSubmitting(true);
 
-    const res = await apiFetch<EducationTimelineItem>("/api/admin/add-education", {
-      method: "POST",
+    const isEditing = editingId !== null;
+    const endpoint = isEditing ? `/api/admin/education/${editingId}` : "/api/admin/add-education";
+    const method = isEditing ? "PUT" : "POST";
+
+    const res = await apiFetch<EducationTimelineItem>(endpoint, {
+      method,
       body: form,
     });
 
     if (res.statusCode >= 400 || !res.data) {
       toast.error({
-        title: "Unable to save timeline",
+        title: isEditing ? "Unable to update timeline" : "Unable to save timeline",
         message: res.message || "The education timeline entry could not be saved.",
       });
       setIsSubmitting(false);
@@ -81,11 +114,12 @@ export default function AdminEducationTimelineManager() {
     }
 
     setForm(initialForm);
+    setEditingId(null);
     setIsModalOpen(false);
     setHistoryError("");
     toast.success({
-      title: "Timeline added",
-      message: "The education history section has been updated.",
+      title: isEditing ? "Timeline updated" : "Timeline added",
+      message: isEditing ? "The education timeline entry was updated." : "The education history section has been updated.",
     });
     setIsSubmitting(false);
     void load();
@@ -139,7 +173,11 @@ export default function AdminEducationTimelineManager() {
 
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingId(null);
+            setForm(initialForm);
+            setIsModalOpen(true);
+          }}
           className="inline-flex items-center gap-3 rounded-full bg-[#5dade2] px-5 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#04111f] shadow-[0_18px_40px_rgba(93,173,226,0.28)] transition hover:-translate-y-1"
         >
           <Plus className="h-4 w-4" />
@@ -182,15 +220,25 @@ export default function AdminEducationTimelineManager() {
                     <p className="mt-3 text-sm leading-7 text-[#f8d46b]">{item.qualification}</p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => void handleDelete(item)}
-                    disabled={deletingId === item.id || typeof item.id !== "number"}
-                    className="inline-flex items-center gap-2 rounded-full border border-rose-300/20 bg-rose-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-rose-100 transition hover:-translate-y-1 hover:bg-rose-300/16 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {deletingId === item.id ? "Deleting..." : "Delete"}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void handleEdit(item)}
+                      className="inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100 transition hover:-translate-y-1 hover:bg-sky-300/16"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(item)}
+                      disabled={deletingId === item.id || typeof item.id !== "number"}
+                      className="inline-flex items-center gap-2 rounded-full border border-rose-300/20 bg-rose-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-rose-100 transition hover:-translate-y-1 hover:bg-rose-300/16 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {deletingId === item.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -203,8 +251,10 @@ export default function AdminEducationTimelineManager() {
           <form onSubmit={handleSubmit} className="w-full max-w-lg rounded-4xl border border-white/10 bg-[#0b1220] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.34)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#5dade2]">Add Education</p>
-                <h3 className="mt-2 text-2xl font-semibold text-white">Create a new education entry</h3>
+                <p className="text-xs uppercase tracking-[0.24em] text-[#5dade2]">{editingId !== null ? "Edit Education" : "Add Education"}</p>
+                <h3 className="mt-2 text-2xl font-semibold text-white">
+                  {editingId !== null ? "Update education entry" : "Create a new education entry"}
+                </h3>
               </div>
               <button
                 type="button"
@@ -245,7 +295,7 @@ export default function AdminEducationTimelineManager() {
             </div>
 
             <button className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#5dade2] py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#04111f] shadow-[0_18px_40px_rgba(93,173,226,0.28)] transition hover:-translate-y-1 disabled:opacity-70" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Education"}
+              {isSubmitting ? (editingId !== null ? "Updating..." : "Saving...") : editingId !== null ? "Update Education" : "Save Education"}
             </button>
           </form>
         </div>

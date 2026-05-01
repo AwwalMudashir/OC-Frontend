@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarRange, Clapperboard, ImageIcon, MapPin, Plus, Trash2, X } from "lucide-react";
+import { CalendarRange, Clapperboard, ImageIcon, MapPin, Pencil, Plus, Trash2, X } from "lucide-react";
 import apiFetch from "../api";
-import { extractYouTubeId, formatEventDate, getPrimaryEventImage, hasEventVideo, normalizeEventItem, resolveEventImage } from "../events/utils";
+import { extractYouTubeId, formatEventDate, getEventImages, getPrimaryEventImage, hasEventVideo, normalizeEventItem, resolveEventImage } from "../events/utils";
 import { useToast } from "./ToastProvider";
 import type { CreateEventRequest, EventItem } from "../types/education";
 
@@ -30,6 +30,24 @@ function toEventDateTimeValue(dateValue: string, timeValue: string) {
   return `${dateValue}T${timeValue}:00`;
 }
 
+function formatDateInput(value: string) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+
+  return parsed.toISOString().slice(0, 10);
+}
+
+function formatTimeInput(value: string) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+
+  return parsed.toISOString().slice(11, 16);
+}
+
 export default function AdminEventManager() {
   const toast = useToast();
 
@@ -38,6 +56,8 @@ export default function AdminEventManager() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [historyError, setHistoryError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -62,6 +82,42 @@ export default function AdminEventManager() {
     setIsLoadingHistory(false);
   }
 
+  async function handleEdit(event: EventItem) {
+    if (typeof event.id !== "number") {
+      toast.error({
+        title: "Unable to edit",
+        message: "This event does not have a valid ID.",
+      });
+      return;
+    }
+
+    setIsLoadingHistory(true);
+    const res = await apiFetch<EventItem>(`/api/admin/event/${event.id}`);
+    setIsLoadingHistory(false);
+
+    if (res.statusCode >= 400 || !res.data) {
+      toast.error({
+        title: "Unable to load event",
+        message: res.message || "The event data could not be loaded for editing.",
+      });
+      return;
+    }
+
+    const existing = normalizeEventItem(res.data);
+    setForm({
+      title: existing.title,
+      description: existing.description,
+      location: existing.location,
+      eventDate: formatDateInput(existing.eventDate),
+      eventTime: formatTimeInput(existing.eventDate),
+      images: [],
+      videoLink: existing.videoLink || "",
+    });
+    setExistingImages(getEventImages(existing));
+    setEditingId(existing.id ?? null);
+    setIsModalOpen(true);
+  }
+
   function updateField<K extends keyof CreateEventRequest>(key: K, value: CreateEventRequest[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
@@ -69,7 +125,10 @@ export default function AdminEventManager() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!form.title.trim() || !form.location.trim() || !form.description.trim() || !form.eventDate || !form.eventTime || form.images.length === 0) {
+    const isEditing = editingId !== null;
+    const hasImages = form.images.length > 0 || existingImages.length > 0;
+
+    if (!form.title.trim() || !form.location.trim() || !form.description.trim() || !form.eventDate || !form.eventTime || !hasImages) {
       toast.error({
         title: "Incomplete event",
         message: "Fill in the title, description, location, date, start time, and at least one image before publishing.",
@@ -118,14 +177,16 @@ export default function AdminEventManager() {
     });
 
     try {
-      const res = await apiFetch<EventItem>("/api/admin/add-events", {
-        method: "POST",
+      const endpoint = isEditing ? `/api/admin/event/${editingId}` : "/api/admin/add-events";
+      const method = isEditing ? "PUT" : "POST";
+      const res = await apiFetch<EventItem>(endpoint, {
+        method,
         body: data,
       });
 
       if (res.statusCode >= 400) {
         toast.error({
-          title: "Unable to save event",
+          title: isEditing ? "Unable to update event" : "Unable to save event",
           message: res.message || "The event could not be saved.",
         });
         return;
@@ -133,16 +194,21 @@ export default function AdminEventManager() {
 
       if (!res.data) {
         toast.error({
-          title: "Save failed",
+          title: isEditing ? "Update failed" : "Save failed",
           message: "The server did not return saved event data.",
         });
         return;
       }
 
       setForm(initialFormState);
+      setExistingImages([]);
+      setEditingId(null);
       setIsModalOpen(false);
       setHistoryError("");
-      toast.success({ title: "Event added", message: "The event history section has been updated." });
+      toast.success({
+        title: isEditing ? "Event updated" : "Event added",
+        message: isEditing ? "The event has been updated." : "The event history section has been updated.",
+      });
       void load();
     } finally {
       setIsSubmitting(false);
@@ -193,7 +259,12 @@ export default function AdminEventManager() {
         </div>
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingId(null);
+            setExistingImages([]);
+            setForm(initialFormState);
+            setIsModalOpen(true);
+          }}
           className="inline-flex items-center gap-3 rounded-full bg-[#f59e0b] px-5 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#030712] shadow-[0_18px_40px_rgba(245,158,11,0.26)] transition hover:-translate-y-1"
         >
           <Plus className="h-4 w-4" />
@@ -256,15 +327,25 @@ export default function AdminEventManager() {
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => void handleDelete(event)}
-                        disabled={deletingId === event.id || typeof event.id !== "number"}
-                        className="inline-flex items-center gap-2 rounded-full border border-rose-300/20 bg-rose-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-rose-100 transition hover:-translate-y-1 hover:bg-rose-300/16 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        {deletingId === event.id ? "Deleting..." : "Delete"}
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void handleEdit(event)}
+                          className="inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100 transition hover:-translate-y-1 hover:bg-sky-300/16"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleDelete(event)}
+                          disabled={deletingId === event.id || typeof event.id !== "number"}
+                          className="inline-flex items-center gap-2 rounded-full border border-rose-300/20 bg-rose-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-rose-100 transition hover:-translate-y-1 hover:bg-rose-300/16 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          {deletingId === event.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
                     </div>
                     <p className="mt-3 text-sm leading-7 text-slate-300">{event.description}</p>
                   </div>
@@ -280,12 +361,18 @@ export default function AdminEventManager() {
           <form onSubmit={handleSubmit} className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-4xl border border-white/10 bg-[#0b1220] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.34)] sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#f59e0b]">Add Event</p>
-                <h3 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Create a new campaign event</h3>
+                <p className="text-xs uppercase tracking-[0.24em] text-[#f59e0b]">{editingId !== null ? "Edit Event" : "Add Event"}</p>
+                <h3 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
+                  {editingId !== null ? "Update campaign event" : "Create a new campaign event"}
+                </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingId(null);
+                  setExistingImages([]);
+                }}
                 className="rounded-full border border-white/10 bg-white/6 p-2 text-white transition hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
@@ -329,6 +416,11 @@ export default function AdminEventManager() {
                 <p className="text-xs leading-6 text-slate-400">
                   Add between 1 and {MAX_EVENT_IMAGES} images. A YouTube link is optional.
                 </p>
+                {existingImages.length > 0 && form.images.length === 0 ? (
+                  <p className="text-sm text-slate-300">
+                    Existing images will be preserved unless you choose new files.
+                  </p>
+                ) : null}
                 {form.images.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {form.images.map((image) => (
@@ -342,7 +434,7 @@ export default function AdminEventManager() {
             </div>
 
             <button className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#f59e0b] py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#030712] shadow-[0_18px_40px_rgba(245,158,11,0.26)] transition hover:-translate-y-1" disabled={isSubmitting}>
-              {isSubmitting ? "Saving Event..." : "Save Event"}
+              {isSubmitting ? (editingId !== null ? "Updating Event..." : "Saving Event...") : editingId !== null ? "Update Event" : "Save Event"}
             </button>
           </form>
         </div>

@@ -102,7 +102,7 @@ export default function AdminDashboardShell({
     { name: "Education", key: "education", icon: GraduationCap },
     { name: "Jobs", key: "jobs", icon: BriefcaseBusiness },
     { name: "Events", key: "events", icon: CalendarRange },
-    { name: "Admins", key: "admins", icon: Users },
+    // { name: "Admins", key: "admins", icon: Users },
   ];
 
   const renderContent = () => {
@@ -113,8 +113,8 @@ export default function AdminDashboardShell({
         return <AdminJobTimelineManager />;
       case "events":
         return <AdminEventManager />;
-      case "admins":
-        return <AdminAdminsManager />;
+      // case "admins":
+      //   return <AdminAdminsManager />;
       default:
         return (
           <div className="space-y-8">
