@@ -383,8 +383,8 @@ export default function AdminEventManager() {
               <input placeholder="Title" value={form.title} onChange={(e) => updateField("title", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-slate-500 focus:border-white/20 focus:outline-none" />
               <input placeholder="Location" value={form.location} onChange={(e) => updateField("location", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-slate-500 focus:border-white/20 focus:outline-none" />
               <div className="grid gap-3 sm:grid-cols-2">
-                <input type="date" value={form.eventDate} onChange={(e) => updateField("eventDate", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-white/20 focus:outline-none" />
-                <input type="time" value={form.eventTime} onChange={(e) => updateField("eventTime", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-white/20 focus:outline-none" />
+                <input type="date" value={form.eventDate} onChange={(e) => updateField("eventDate", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-white/20 px-4 py-3 text-white focus:border-white/20 focus:outline-none" />
+                <input type="time" value={form.eventTime} onChange={(e) => updateField("eventTime", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-white/20 px-4 py-3 text-white focus:border-white/20 focus:outline-none" />
               </div>
               <div className="space-y-2">
                 <textarea
