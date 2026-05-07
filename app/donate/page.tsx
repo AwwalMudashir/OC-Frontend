@@ -78,49 +78,54 @@ export default function DonatePage() {
 	  return;
 	}
 
-    setLoading(true);
+		setLoading(true);
 
-    try {
-      const res = await apiFetch<DonationInitData>("/api/donate", {
-        method: "POST",
-        body: {
-          name,
-          email,
-          amount: finalAmount,
-        },
-      });
+		try {
+			const res = await apiFetch<DonationInitData>("/api/donate", {
+				method: "POST",
+				body: {
+					name,
+					email,
+					amount: finalAmount,
+				},
+			});
 
-      if (res.statusCode !== 200) {
+			if (res.statusCode !== 200) {
 				setStatus({
-		  tone: "error",
-		  title: "Donation request failed",
-		  message: res.message || "We could not connect you to the payment gateway right now. Please try again.",
-		});
-        return;
-      }
+					tone: "error",
+					title: "Donation request failed",
+					message: res.message || "We could not connect you to the payment gateway right now. Please try again.",
+				});
+				// Re-enable submit for a retry on hard failure
+				setLoading(false);
+				return;
+			}
 
-      if (res.data?.authorizationUrl) {
-		if (typeof window !== "undefined") {
-		  window.sessionStorage.setItem("donation_donor_name", name.trim());
+			if (res.data?.authorizationUrl) {
+				if (typeof window !== "undefined") {
+					window.sessionStorage.setItem("donation_donor_name", name.trim());
+				}
+				// Do not clear `loading` here — navigating away prevents further UI interaction
+				window.location.href = res.data.authorizationUrl;
+				return;
+			}
+
+			setStatus({
+				tone: "info",
+				title: "Payment page unavailable",
+				message: res.message || "The donation request completed, but no payment redirect URL was returned.",
+			});
+			// allow retry
+			setLoading(false);
+		} catch {
+			setStatus({
+				tone: "error",
+				title: "Network error",
+				message: "The donation request could not reach the server. Check your connection and try again.",
+			});
+			// allow retry
+			setLoading(false);
 		}
-        window.location.href = res.data.authorizationUrl;
-        return;
-      }
-
-			setStatus({
-		 tone: "info",
-		 title: "Payment page unavailable",
-		 message: res.message || "The donation request completed, but no payment redirect URL was returned.",
-	  });
-    } catch {
-			setStatus({
-		 tone: "error",
-		 title: "Network error",
-		 message: "The donation request could not reach the server. Check your connection and try again.",
-	  });
-    } finally {
-      setLoading(false);
-    }
   }
 
   return (
